@@ -3,45 +3,46 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <cassert>
 
-BigInteger::BigInteger() {
+BigInt::BigInteger::BigInteger() {
     this -> sign = PLUS;
     this -> data = std::vector<int>();
 }
 
-BigInteger::BigInteger(int x) {
+BigInt::BigInteger::BigInteger(int x) {
     this -> sign = x >= 0 ? PLUS : MINUS;
     this -> data = std::vector<int>();
     this -> data.push_back(std::abs(x));
     this -> cleanup_zeroes();
 }
 
-BigInteger BigInteger::operator+() const {
+BigInt::BigInteger BigInt::BigInteger::operator+() const {
     return BigInteger(*this);
 }
 
-BigInteger BigInteger::operator-() const {
-    BigInteger result = BigInteger(*this);
+BigInt::BigInteger BigInt::BigInteger::operator-() const {
+    BigInt::BigInteger result = BigInteger(*this);
     result.inverse_sign();
     result.cleanup_zeroes();
     return result;
 }
 
-BigInteger BigInteger::abs() const {
-    BigInteger result = BigInteger(*this);
+BigInt::BigInteger BigInt::BigInteger::abs() const {
+    BigInt::BigInteger result = BigInteger(*this);
     result.sign = PLUS;
     return result;
 }
 
-bool BigInteger::operator==(const BigInteger &rhs) const {
+bool BigInt::BigInteger::operator==(const BigInt::BigInteger &rhs) const {
     return (sign == rhs.sign && data == rhs.data);
 }
 
-bool BigInteger::operator!=(const BigInteger &rhs) const {
+bool BigInt::BigInteger::operator!=(const BigInt::BigInteger &rhs) const {
     return !((*this) == rhs);
 }
 
-bool BigInteger::operator<(const BigInteger &rhs) const {
+bool BigInt::BigInteger::operator<(const BigInt::BigInteger &rhs) const {
     if (sign != rhs.sign) {
         return sign == MINUS;
     }
@@ -58,20 +59,20 @@ bool BigInteger::operator<(const BigInteger &rhs) const {
     return false;
 }
 
-bool BigInteger::operator>(const BigInteger &rhs) const {
+bool BigInt::BigInteger::operator>(const BigInt::BigInteger &rhs) const {
     return !((*this) == rhs) && !((*this) < rhs);
 }
 
-bool BigInteger::operator<=(const BigInteger &rhs) const {
+bool BigInt::BigInteger::operator<=(const BigInt::BigInteger &rhs) const {
     return ((*this) == rhs || (*this) < rhs);
 }
 
-bool BigInteger::operator>=(const BigInteger &rhs) const {
+bool BigInt::BigInteger::operator>=(const BigInt::BigInteger &rhs) const {
     return ((*this) == rhs || (*this) > rhs);
 }
 
-BigInteger BigInteger::operator+(const BigInteger& rhs) const {
-    BigInteger result;
+BigInt::BigInteger BigInt::BigInteger::operator+(const BigInteger& rhs) const {
+    BigInt::BigInteger result;
     if (this -> sign == rhs.sign) {
         auto pos1 = this -> data.begin();
         auto pos2 = rhs.data.begin();
@@ -89,7 +90,7 @@ BigInteger BigInteger::operator+(const BigInteger& rhs) const {
         }
         result.sign = this -> sign;
     } else {
-        BigInteger smaller, bigger;
+        BigInt::BigInteger smaller, bigger;
         if ((*this).abs() < rhs.abs()) {
             smaller = *this;
             bigger = rhs;
@@ -122,11 +123,11 @@ BigInteger BigInteger::operator+(const BigInteger& rhs) const {
     return result;
 }
 
-BigInteger BigInteger::operator-(const BigInteger& rhs) const {
+BigInt::BigInteger BigInt::BigInteger::operator-(const BigInteger& rhs) const {
     return (*this) + (-rhs);
 }
 
-void BigInteger::cleanup_zeroes() {
+void BigInt::BigInteger::cleanup_zeroes() {
     while (!data.empty() && data.back() == 0) {
         data.pop_back();
     }
@@ -135,7 +136,7 @@ void BigInteger::cleanup_zeroes() {
     }
 }
 
-void BigInteger::inverse_sign() {
+void BigInt::BigInteger::inverse_sign() {
     if (this -> sign == MINUS) {
         this -> sign = PLUS;
     } else {
@@ -143,7 +144,7 @@ void BigInteger::inverse_sign() {
     }
 }
 
-std::ostream &operator<<(std::ostream &os, const BigInteger &rhs) {
+std::ostream& BigInt::operator<<(std::ostream &os, const BigInt::BigInteger &rhs) {
     if (rhs.sign == MINUS) {
         os << '-';
     }
@@ -153,7 +154,7 @@ std::ostream &operator<<(std::ostream &os, const BigInteger &rhs) {
     for (auto it = rhs.data.end() - 1; it >= rhs.data.begin(); it--) {
         std::string current_str = std::to_string(*it);
         if (it != rhs.data.end() - 1) {
-            while (current_str.length() < BigInteger::CELL_LENGTH) {
+            while (current_str.length() < BigInt::BigInteger::CELL_LENGTH) {
                 current_str = '0' + current_str; // NOLINT(performance-inefficient-string-concatenation)
             }
         }
@@ -162,7 +163,7 @@ std::ostream &operator<<(std::ostream &os, const BigInteger &rhs) {
     return os;
 }
 
-BigInteger::BigInteger(const std::string& s) {
+BigInt::BigInteger::BigInteger(const std::string& s) {
     if (s.length() == 0) {
         throw InvalidBigIntegerStringException();
     }
@@ -194,18 +195,18 @@ BigInteger::BigInteger(const std::string& s) {
     }
 }
 
-std::istream &operator>>(std::istream &is, BigInteger &rhs) {
+std::istream& BigInt::operator>>(std::istream &is, BigInt::BigInteger &rhs) {
     std::string s;
     is >> s;
     rhs = BigInteger(s);
     return is;
 }
 
-BigInteger BigInteger::operator*(const BigInteger &rhs) const {
-    BigInteger result;
+BigInt::BigInteger BigInt::BigInteger::operator*(const BigInt::BigInteger &rhs) const {
+    BigInt::BigInteger result;
 
     std::vector<long long> result_vec;
-    std::vector<fft_base> left_arg(data.begin(), data.end()), right_arg(rhs.data.begin(), rhs.data.end());
+    std::vector<BigInt::fft_base> left_arg(data.begin(), data.end()), right_arg(rhs.data.begin(), rhs.data.end());
     size_t n = 1;
     while (n < std::max(data.size(), rhs.data.size())) {
         n *= 2;
@@ -213,12 +214,12 @@ BigInteger BigInteger::operator*(const BigInteger &rhs) const {
     n *= 2;
     left_arg.resize(n);
     right_arg.resize(n);
-    fft(left_arg, false);
-    fft(right_arg, false);
+    BigInt::fft(left_arg, false);
+    BigInt::fft(right_arg, false);
     for (size_t i = 0; i < n; i++) {
         left_arg[i] *= right_arg[i];
     }
-    fft(left_arg, true);
+    BigInt::fft(left_arg, true);
     result_vec.resize(n);
     for (size_t i = 0; i < n; i++) {
         result_vec[i] = (long long)(floor(left_arg[i].real() + 0.5));
@@ -246,9 +247,9 @@ BigInteger BigInteger::operator*(const BigInteger &rhs) const {
     return result;
 }
 
-BigInteger BigInteger::pow(BigInteger exp, const BigInteger& modulo) const {
-    BigInteger mult = *this;
-    BigInteger result = BigInteger(1);
+BigInt::BigInteger BigInt::BigInteger::pow(BigInt::BigInteger exp, const BigInteger& modulo) const {
+    BigInt::BigInteger mult = *this;
+    BigInt::BigInteger result = BigInteger(1);
     while (exp != BigInteger(0)) {
         if (exp.data[0] % 2 == 1) {
             result *= mult;
@@ -257,38 +258,39 @@ BigInteger BigInteger::pow(BigInteger exp, const BigInteger& modulo) const {
             }
         }
         mult *= mult;
+        mult %= modulo;
         exp /= BigInteger(2);
     }
     return result;
 }
 
-BigInteger &BigInteger::operator*=(const BigInteger &rhs) {
-    BigInteger result = (*this) * rhs;
+BigInt::BigInteger &BigInt::BigInteger::operator*=(const BigInt::BigInteger &rhs) {
+    BigInt::BigInteger result = (*this) * rhs;
     this -> sign = result.sign;
     this -> data = result.data;
     return *this;
 }
 
-BigInteger BigInteger::getIntOfLen(int len) {
-    BigInteger res(1);
+BigInt::BigInteger BigInt::BigInteger::getIntOfLen(int len) {
+    BigInt::BigInteger res(1);
     return res.scale(len - 1);
 }
 
-BigInteger BigInteger::operator/(const BigInteger &rhs) const {
+BigInt::BigInteger BigInt::BigInteger::operator/(const BigInt::BigInteger &rhs) const {
     std::vector<int> resultVec;
 
     if (this->data.size() < rhs.data.size())
         resultVec = std::vector<int>(0, 1);
     else {
 
-        BigInteger curPow = getIntOfLen(this->data.size() - rhs.data.size() + 1);
-        BigInteger currentSum = BigInteger(0);
+        BigInt::BigInteger curPow = getIntOfLen(this->data.size() - rhs.data.size() + 1);
+        BigInt::BigInteger currentSum = BigInteger(0);
 
         while (curPow != BigInteger(0)) {
             int lower_bound = 0, upper_bound = MODULO - 1;
             while (upper_bound != lower_bound) {
                 int middle = (lower_bound + upper_bound + 1) / 2;
-                BigInteger middleMultiplier = curPow.scalar_mult(middle);
+                BigInt::BigInteger middleMultiplier = curPow.scalar_mult(middle);
                 if (middleMultiplier * rhs.abs() + currentSum <= this -> abs())
                     lower_bound = middle;
                 else
@@ -300,7 +302,7 @@ BigInteger BigInteger::operator/(const BigInteger &rhs) const {
         }
         std::reverse(resultVec.begin(), resultVec.end());
     }
-    BigInteger result;
+    BigInt::BigInteger result;
     result.sign = (this->sign == rhs.sign ? BigIntegerSign::PLUS : BigIntegerSign::MINUS);
     if (result.sign == BigIntegerSign::PLUS) {
         result.data = resultVec;
@@ -313,8 +315,8 @@ BigInteger BigInteger::operator/(const BigInteger &rhs) const {
     return result;
 }
 
-BigInteger BigInteger::scale(int n) const {
-    BigInteger result = *this;
+BigInt::BigInteger BigInt::BigInteger::scale(int n) const {
+    BigInt::BigInteger result = *this;
     if (n >= 0) {
         std::vector<int> zeroes(n, 0);
         result.data.reserve(result.data.size() + zeroes.size());
@@ -325,39 +327,39 @@ BigInteger BigInteger::scale(int n) const {
     return result;
 }
 
-BigInteger BigInteger::scalar_mult(int n) const {
-    BigInteger result = *this;
+BigInt::BigInteger BigInt::BigInteger::scalar_mult(int n) const {
+    BigInt::BigInteger result = *this;
     for (auto& x : result.data) {
         x *= n;
     }
     return result;
 }
 
-BigInteger &BigInteger::operator+=(const BigInteger &rhs) {
+BigInt::BigInteger &BigInt::BigInteger::operator+=(const BigInt::BigInteger &rhs) {
     *this = *this + rhs;
     return *this;
 }
 
-BigInteger &BigInteger::operator-=(const BigInteger &rhs) {
+BigInt::BigInteger &BigInt::BigInteger::operator-=(const BigInt::BigInteger &rhs) {
     *this = *this - rhs;
     return *this;
 }
 
-BigInteger BigInteger::operator%(const BigInteger &rhs) const {
-    BigInteger result;
+BigInt::BigInteger BigInt::BigInteger::operator%(const BigInt::BigInteger &rhs) const {
+    BigInt::BigInteger result;
     return (*this) - rhs * (*this / rhs);
 }
 
-BigInteger &BigInteger::operator/=(const BigInteger &rhs) {
+BigInt::BigInteger &BigInt::BigInteger::operator/=(const BigInt::BigInteger &rhs) {
     *this = *this / rhs;
     return *this;
 }
 
-BigInteger BigInteger::sqrt() const {
-    BigInteger result = getIntOfLen(this->data.size() / 2);
+BigInt::BigInteger BigInt::BigInteger::sqrt() const {
+    BigInt::BigInteger result = getIntOfLen(this->data.size() / 2);
     bool revert = false;
     while (true) {
-        BigInteger nextResult = (*this / result + result) / BigInteger(2);
+        BigInt::BigInteger nextResult = (*this / result + result) / BigInteger(2);
         if (result == nextResult || (result < nextResult && revert)) {
             break;
         }
@@ -367,21 +369,21 @@ BigInteger BigInteger::sqrt() const {
     return result;
 }
 
-BigInteger BigInteger::restoreFromModuloes(const std::vector<BigInteger>& remainders,
+BigInt::BigInteger BigInt::BigInteger::restoreFromModuloes(const std::vector<BigInteger>& remainders,
                                            const std::vector<BigInteger>& primes) {
 
     if (remainders.size() != primes.size()) {
         throw InvalidBigIntegerStringException();
     }
 
-    BigInteger result;
+    BigInt::BigInteger result;
     std::vector<std::vector<BigInteger> > reciprocals(primes.size(), std::vector<BigInteger>(primes.size()));
 
     for (int i=0; i<primes.size(); i++)
         for (int j=0; j<primes.size(); j++)
             reciprocals[i][j] = primes[i].pow(primes[j] - BigInteger(2), primes[j]);
 
-    BigInteger curMultiplier(1);
+    BigInt::BigInteger curMultiplier(1);
     std::vector<BigInteger> answerVec(primes.size());
     for (int i=0; i<primes.size(); i++) {
         answerVec[i] = remainders[i];
@@ -395,25 +397,46 @@ BigInteger BigInteger::restoreFromModuloes(const std::vector<BigInteger>& remain
     return result;
 }
 
-BigInteger &BigInteger::operator%=(const BigInteger &rhs) {
+BigInt::BigInteger &BigInt::BigInteger::operator%=(const BigInt::BigInteger &rhs) {
     return *this = *this % rhs;
 }
 
-void fft(std::vector<fft_base> &arg, bool invert) {
+int BigInt::BigInteger::toInt() const {
+    assert(*this <= BigInteger(1000000000));
+    int ans = 0;
+    if (this->data.empty()) return ans;
+    int curMultiplier = 1;
+    for (auto digit : this->data) {
+        ans += curMultiplier * digit;
+        curMultiplier *= MODULO;
+    }
+    return ans;
+}
+
+const BigInt::BigInteger BigInt::BigInteger::operator++(int) {
+    return *this = *this + BigInteger(1);
+}
+
+bool BigInt::BigInteger::isOdd() const {
+    if (data.empty()) return false;
+    return data[0] % 2;
+}
+
+void BigInt::fft(std::vector<BigInt::fft_base> &arg, bool invert) {
     int n = arg.size();
     if (n == 1) {
         return;
     }
-    std::vector<fft_base> a0(n / 2), a1(n / 2);
+    std::vector<BigInt::fft_base> a0(n / 2), a1(n / 2);
     for (int i = 0, j = 0; i < n; i += 2, j++) {
         a0[j] = arg[i];
         a1[j] = arg[i+1];
     }
-    fft(a0, invert);
-    fft(a1, invert);
+    BigInt::fft(a0, invert);
+    BigInt::fft(a1, invert);
 
     double angle = 2 * M_PI / n * (invert ? -1 : 1);
-    fft_base w(1), wn(cos(angle), sin(angle));
+    BigInt::fft_base w(1), wn(cos(angle), sin(angle));
     for (int i = 0; i < n / 2; i++) {
         arg[i] = a0[i] + w * a1[i];
         arg[i + n / 2] = a0[i] -  w * a1[i];

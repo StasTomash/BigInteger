@@ -4,5 +4,6 @@
 
 int main() {
     Interface mainInterface(std::cin, std::cout);
+    mainInterface.chooseLab();
     mainInterface.acceptLoop();
 }
