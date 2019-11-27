@@ -4,6 +4,8 @@
 #include <cmath>
 #include <algorithm>
 #include <cassert>
+#include <random>
+#include <functional>
 
 BigInt::BigInteger::BigInteger() {
     this -> sign = PLUS;
@@ -420,6 +422,21 @@ const BigInt::BigInteger BigInt::BigInteger::operator++(int) {
 bool BigInt::BigInteger::isOdd() const {
     if (data.empty()) return false;
     return data[0] % 2;
+}
+
+BigInt::BigInteger BigInt::BigInteger::getRandOfLen(int len) {
+    BigInteger ans = getIntOfLen(len);
+    auto dice_rand = std::bind(std::uniform_int_distribution<int>(0, MODULO - 1),
+                               std::mt19937(228)); // NOLINT(cert-msc32-c,cert-msc51-cpp)
+    for (int i = 0; i < len; i++) {
+        ans.data[i] = dice_rand();
+    }
+    return ans;
+}
+
+BigInt::BigInteger BigInt::BigInteger::rand(const BigInt::BigInteger &maxVal) {
+    BigInteger ans = getRandOfLen(maxVal.data.size());
+    return ans % maxVal;
 }
 
 void BigInt::fft(std::vector<BigInt::fft_base> &arg, bool invert) {

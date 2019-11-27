@@ -9,12 +9,6 @@
 #include "BigIntegerAlgorithm.h"
 #include <iostream>
 
-struct InvalidConsoleArguments : public std::exception {
-    const char* what () const noexcept override {
-        return "Invalid arguments. See \'help\' command for reference";
-    }
-};
-
 class Interface {
 private:
     enum OPERATION_TYPE {
@@ -36,6 +30,7 @@ private:
         JACOBI,
         SQRTMOD,
         IS_PRIME,
+        ENCODE,
 
         HELP,
         INVALID,
@@ -68,6 +63,7 @@ private:
     void processLegendre(const std::vector<std::string>& args);
     void processJacobi(const std::vector<std::string>& args);
     void processSqrtMod(const std::vector<std::string>& args);
+    void processEncode(const std::vector<std::string>& args);
     void processIsPrime(const std::vector<std::string>& args);
     void processHelp(const std::vector<std::string>& args);
     void processInvalid(const std::vector<std::string>& args);

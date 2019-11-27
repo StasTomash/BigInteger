@@ -4,6 +4,7 @@
 
 #include "Interface.h"
 #include <algorithm>
+#include <tuple>
 
 using namespace BigInt;
 
@@ -92,6 +93,12 @@ void Interface::acceptLoop() {
                     case IS_PRIME:
                         processIsPrime(parsedArgs);
                         break;
+                    case ENCODE:
+                        processEncode(parsedArgs);
+                        break;
+                    case HELP:
+                        processHelp(parsedArgs);
+                        break;
                     case EXIT:
                         exitFlag = true;
                         break;
@@ -150,6 +157,8 @@ Interface::OPERATION_TYPE Interface::parseFunctionName(std::string operationType
         return OPERATION_TYPE::SQRTMOD;
     } else if (operationType == "prime") {
         return OPERATION_TYPE::IS_PRIME;
+    } else if (operationType == "encode") {
+        return OPERATION_TYPE::ENCODE;
     }
     else {
         return OPERATION_TYPE::INVALID;
@@ -401,6 +410,7 @@ void Interface::processJacobi(const std::vector<std::string> &args) {
     BigInteger ans = BigInt::jacobiSymbol(a, p);
     outputStream << ans << "\n";
 }
+
 void Interface::processSqrtMod(const std::vector<std::string> &args) {
     if (args.size() != 3)
         throw InvalidConsoleArguments();
@@ -419,6 +429,28 @@ void Interface::processSqrtMod(const std::vector<std::string> &args) {
     }
 }
 
+void Interface::processEncode(const std::vector<std::string> &args) {
+    if (args.size() != 2)
+        throw InvalidConsoleArguments();
+
+    BigInteger arg;
+    parseArgsToBigInts(args, arg);
+    std::tuple<BigInt::KeyPair, BigInt::EllipticCurve::Point, BigInt::EllipticCurve::Point>
+            encoded = BigInt::encode(arg);
+    auto keyPair = std::get<0>(encoded);
+    auto a = std::get<1>(encoded);
+    auto b = std::get<2>(encoded);
+    outputStream << "Elliptic curve parameters: \n" << *(a.getParent()) << std::endl;
+    outputStream << "Public key is: \n" << keyPair.publicKey << std::endl;
+    outputStream << "Private key is: \n" << keyPair.privateKey << std::endl;
+    outputStream << "Encoded: \n";
+    outputStream << "A = " << a << std::endl;
+    outputStream << "B = " << b << std::endl;
+
+    auto decoded = BigInt::decode(a, b, keyPair);
+    outputStream << "Decoded: " << decoded << std::endl;
+}
+
 void Interface::processIsPrime(const std::vector<std::string> &args){
     if (args.size() != 2)
         throw InvalidConsoleArguments();
@@ -431,16 +463,29 @@ void Interface::processIsPrime(const std::vector<std::string> &args){
 
 void Interface::processHelp(const std::vector<std::string> &args) {
     outputStream << "Following commands are allowed: \n";
-    outputStream << "\tadd x y [mod]\n";
-    outputStream << "\tsub x y [mod]\n";
-    outputStream << "\tmult x y [mod]\n";
-    outputStream << "\tdiv x y [mod]\n";
-    outputStream << "\tmod x y\n";
-    outputStream << "\tpow x y [mod]\n";
-    outputStream << "\tcmp x y\n";
-    outputStream << "\tsqrt x\n";
-    outputStream << "\tsolve cnt   [will prompt you for additional input]\n";
+    if (labNum == LAB_1) {
+        outputStream << "\tadd x y [mod]\n";
+        outputStream << "\tsub x y [mod]\n";
+        outputStream << "\tmult x y [mod]\n";
+        outputStream << "\tdiv x y [mod]\n";
+        outputStream << "\tmod x y\n";
+        outputStream << "\tpow x y [mod]\n";
+        outputStream << "\tcmp x y\n";
+        outputStream << "\tsqrt x\n";
+        outputStream << "\tsolve cnt   [will prompt you for additional input]\n";
+    } else {
+        outputStream << "\tfactorize x\n";
+        outputStream << "\tlog n base mod\n";
+        outputStream << "\teuler n\n";
+        outputStream << "\tmobius n\n";
+        outputStream << "\tlegendre n p\n";
+        outputStream << "\tjacobi n p\n";
+        outputStream << "\tsqrtmod a n mod\n";
+        outputStream << "\tprime p\n";
+        outputStream << "\tencode m [0 <= m <= 255]\n";
+    }
     outputStream << "\thelp\n";
+    outputStream << "\texit\n";
 }
 
 void Interface::processInvalid(const std::vector<std::string>& /*args*/) {
@@ -461,5 +506,3 @@ void Interface::chooseLab() {
         }
     }
 }
-
-

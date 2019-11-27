@@ -21,6 +21,11 @@ namespace BigInt {
             return "Invalid string value for BigInteger cast";
         }
     };
+    struct InvalidConsoleArguments : public std::exception {
+        const char* what () const noexcept override {
+            return "Invalid arguments. See \'help\' command for reference";
+        }
+    };
 
     class BigInteger {
     protected:
@@ -37,6 +42,7 @@ namespace BigInt {
         static BigInteger getIntOfLen(int len);
         friend std::ostream &operator<<(std::ostream &os, const BigInteger &rhs);
         friend std::istream &operator>>(std::istream &is, BigInteger &rhs);
+        static BigInteger getRandOfLen(int len);
 
     public:
         explicit BigInteger(int x);
@@ -46,6 +52,7 @@ namespace BigInt {
         BigInteger(const BigInteger &) = default;
         BigInteger();
         BigInteger abs() const;
+        static BigInteger rand(const BigInteger& maxVal);
 
         bool operator==(const BigInteger &rhs) const;
         bool operator!=(const BigInteger &rhs) const;
