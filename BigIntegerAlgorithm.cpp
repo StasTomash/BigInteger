@@ -184,7 +184,7 @@ BigInt::BigInteger BigInt::sqrtMod(const BigInt::BigInteger &arg, const BigInt::
     auto multiplyPair = [omega = a * a - arg, p = modulo](const std::pair<BigInteger, BigInteger>& lhs,
                                                           const std::pair<BigInteger, BigInteger>& rhs) {
         return std::make_pair((lhs.first * rhs.first + lhs.second * rhs.second * omega) % p,
-                              (lhs.first * rhs.second + lhs.second * rhs.first));
+                              (lhs.first * rhs.second + lhs.second * rhs.first) % p);
     };
     auto powResult = std::make_pair(BigInteger(1), BigInteger(0));
     auto base = std::make_pair(a, BigInteger(1));

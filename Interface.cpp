@@ -480,7 +480,7 @@ void Interface::processHelp(const std::vector<std::string> &args) {
         outputStream << "\tmobius n\n";
         outputStream << "\tlegendre n p\n";
         outputStream << "\tjacobi n p\n";
-        outputStream << "\tsqrtmod a n mod\n";
+        outputStream << "\tsqrtmod n mod\n";
         outputStream << "\tprime p\n";
         outputStream << "\tencode m [0 <= m <= 255]\n";
     }
