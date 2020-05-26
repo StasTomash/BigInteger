@@ -68,14 +68,14 @@ bool BigInt::isPrime(const BigInt::BigInteger& arg) {
         if (x.pow(rem, arg) == BigInteger(1)) {
             continue;
         }
-        curPower = BigInteger(1);
         bool isEvidence = false;
+        BigInteger curTrial = x.pow(rem, arg);
         for (BigInteger i(0); i < curExp; i++) {
-            if (x.pow(curPower * rem, arg) == arg - BigInteger(1)) {
+            if (curTrial == arg - BigInteger(1)) {
                 isEvidence = true;
                 break;
             }
-            curPower *= BigInteger(2);
+            curTrial = (curTrial * curTrial) % arg;
         }
         if (!isEvidence) {
             return false;

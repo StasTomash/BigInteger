@@ -260,7 +260,9 @@ BigInt::BigInteger BigInt::BigInteger::pow(BigInt::BigInteger exp, const BigInte
             }
         }
         mult *= mult;
-        mult %= modulo;
+        if (modulo != BigInteger(0)) {
+            mult %= modulo;
+        }
         exp /= BigInteger(2);
     }
     return result;
@@ -426,10 +428,24 @@ bool BigInt::BigInteger::isOdd() const {
 
 BigInt::BigInteger BigInt::BigInteger::getRandOfLen(int len) {
     BigInteger ans = getIntOfLen(len);
-    auto dice_rand = std::bind(std::uniform_int_distribution<int>(0, MODULO - 1),
-                               std::mt19937(228)); // NOLINT(cert-msc32-c,cert-msc51-cpp)
+    std::uniform_int_distribution<int> distribution(0, MODULO - 1);
+    static std::random_device randomDevice;
     for (int i = 0; i < len; i++) {
-        ans.data[i] = dice_rand();
+        ans.data[i] = distribution(randomDevice);
+    }
+    return ans;
+}
+
+BigInt::BigInteger BigInt::BigInteger::getRandOfBitLen(int len) {
+    BigInteger ans(0);
+    std::uniform_int_distribution<int> distribution(0, 1);
+    static std::random_device randomDevice;
+    BigInteger currentPower(1);
+    for (int i = 0; i < len; i++) {
+        if (distribution(randomDevice)) {
+            ans += currentPower;
+        }
+        currentPower *= BigInteger(2);
     }
     return ans;
 }

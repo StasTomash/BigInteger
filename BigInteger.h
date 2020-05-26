@@ -42,7 +42,6 @@ namespace BigInt {
         static BigInteger getIntOfLen(int len);
         friend std::ostream &operator<<(std::ostream &os, const BigInteger &rhs);
         friend std::istream &operator>>(std::istream &is, BigInteger &rhs);
-        static BigInteger getRandOfLen(int len);
 
     public:
         explicit BigInteger(int x);
@@ -80,6 +79,9 @@ namespace BigInt {
 
         static BigInteger
             restoreFromModuloes(const std::vector<BigInteger> &remainders, const std::vector<BigInteger> &primes);
+
+        static BigInteger getRandOfLen(int len);
+        static BigInteger getRandOfBitLen(int len);
     };
 
     std::ostream &operator<<(std::ostream &os, const BigInteger &rhs);
