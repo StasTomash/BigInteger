@@ -455,6 +455,12 @@ BigInt::BigInteger BigInt::BigInteger::rand(const BigInt::BigInteger &maxVal) {
     return ans % maxVal;
 }
 
+std::string BigInt::BigInteger::toString() const {
+    std::stringstream ss;
+    ss << *this;
+    return ss.str();
+}
+
 void BigInt::fft(std::vector<BigInt::fft_base> &arg, bool invert) {
     int n = arg.size();
     if (n == 1) {

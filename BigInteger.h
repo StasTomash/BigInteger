@@ -47,6 +47,7 @@ namespace BigInt {
         explicit BigInteger(int x);
         explicit BigInteger(const std::string &s);
         int toInt() const;
+        std::string toString() const;
         bool isOdd() const;
         BigInteger(const BigInteger &) = default;
         BigInteger();
