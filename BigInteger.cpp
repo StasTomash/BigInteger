@@ -15,7 +15,8 @@ BigInt::BigInteger::BigInteger() {
 BigInt::BigInteger::BigInteger(int x) {
     this -> sign = x >= 0 ? PLUS : MINUS;
     this -> data = std::vector<int>();
-    this -> data.push_back(std::abs(x));
+    this -> data.push_back(std::abs(x) % MODULO);
+    this -> data.push_back(std::abs(x) / MODULO);
     this -> cleanup_zeroes();
 }
 
@@ -374,7 +375,7 @@ BigInt::BigInteger BigInt::BigInteger::sqrt() const {
 }
 
 BigInt::BigInteger BigInt::BigInteger::restoreFromModuloes(const std::vector<BigInteger>& remainders,
-                                           const std::vector<BigInteger>& primes) {
+                                                           const std::vector<BigInteger>& primes) {
 
     if (remainders.size() != primes.size()) {
         throw InvalidBigIntegerStringException();
@@ -406,7 +407,6 @@ BigInt::BigInteger &BigInt::BigInteger::operator%=(const BigInt::BigInteger &rhs
 }
 
 int BigInt::BigInteger::toInt() const {
-    assert(*this <= BigInteger(1000000000));
     int ans = 0;
     if (this->data.empty()) return ans;
     int curMultiplier = 1;
